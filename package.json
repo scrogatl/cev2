@@ -1,0 +1,24 @@
+{
+  "private": true,
+  "name": "ce-v2",
+  "version": "0.1.0",
+  "scripts": {
+    "start": "nr1 nerdpack:serve",
+    "test": "exit 0"
+  },
+  "nr1": {
+    "uuid": "34bb6938-0645-4eb5-b1ed-dfe48503d910"
+  },
+  "dependencies": {
+    "prop-types": "^15.6.2",
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3",
+    "graphql": "^14.5.3",
+    "graphql-tag": "^2.10.1"
+  },
+  "browserslist": [
+    "last 2 versions",
+    "not ie < 11",
+    "not dead"
+  ]
+}

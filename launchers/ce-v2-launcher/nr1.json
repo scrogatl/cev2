@@ -1,0 +1,7 @@
+{
+    "schemaType": "LAUNCHER",
+    "id": "ce-v2-launcher",
+    "description": "Describe me",
+    "displayName": "CeV2Launcher",
+    "rootNerdletId": "ce-v2-nerdlet"
+}
