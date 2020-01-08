@@ -1,7 +1,9 @@
-import { PlatformStateContext, NerdletStateContext, AutoSizer } from 'nr1';
+import { AccountsQuery, PlatformStateContext, NerdletStateContext, AutoSizer } from 'nr1';
 import CeViewer from './ceviewer';
+import { getCustomEventList } from './utils';
 
 export default class Wrapper extends React.PureComponent {
+
   render() {
     return (
       <PlatformStateContext.Consumer>
