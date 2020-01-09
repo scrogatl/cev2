@@ -71,106 +71,85 @@ export const accountsWithData = async (eventType) => {
 export const nativeEvents = [
   "AjaxRequest",
   "BrowserInteraction",
-  // "ErrorTrace",
-  // "InfrastructureEvent",
-  // "IntegrationError",
-  // "IntegrationProviderReport",
-  // "Log",
-  // "Metric",
-  // "NetworkSample",
-  // "NginxSample",
-  // "NrAuditEvent",
-  // "NrUsage",
-  // "PageAction",
-  // "PageView",
-  // "PageView",
-  // "PageViewTiming",
-  // "PageViewTiming",
-  // "ProcessSample",
-  // "RedisKeyspaceSample",
-  // "RedisSample",
-  // "Relationship",
-  // "SampledTransaction",
-  // "SampledTransactionError",
-  // "Span",
-  // "Span",
-  // "StatsDApplicationEvent",
-  // "StorageSample",
-  // "SyntheticCheck",
-  // "SyntheticCheck",
-  // "SyntheticRequest",
-  // "SyntheticsPrivateLocationStatus",
-  // "SyntheticsPrivateMinion",
-  // "SystemSample",
-  // "Transaction",
+  "ErrorTrace",
+  "InfrastructureEvent",
+  "IntegrationError",
+  "IntegrationProviderReport",
+  "Log",
+  "Metric",
+  "NetworkSample",
+  "NginxSample",
+  "NrAuditEvent",
+  "NRUsageEvent",
+  "NrDailyUsage",
+  "NrUsage",
+  "PageAction",
+  "PageView",
+  "PageView",
+  "PageViewTiming",
+  "PageViewTiming",
+  "ProcessSample",
+  "RedisKeyspaceSample",
+  "RedisSample",
+  "Relationship",
+  "SampledTransaction",
+  "SampledTransactionError",
+  "Span",
+  "Span",
+  "StatsDApplicationEvent",
+  "StorageSample",
+  "SyntheticCheck",
+  "SyntheticCheck",
+  "SyntheticRequest",
+  "SyntheticsPrivateLocationStatus",
+  "SyntheticsPrivateMinion",
+  "SystemSample",
+  "Transaction",
   "TransactionError",
   "TransactionTrace",
 ];
 
-export const generateTableData = async (accountId) => {
-  const customEventList = await _getCustomEventList(accountId);
-  const customEventsWithCounts = await _getCounts(customEventList, accountId);
-  let data = await _buildTableDataBody(customEventsWithCounts);
+export async function genTableData(accountId) {
+  const data = [];
+  const rv = await _nrqlQuery('show event types', accountId);
+  const allEvents = rv.data.chart[0].data[0].eventTypes;
+  await console.debug("-------- genTableData fired----------");
+  await console.debug(accountId);
+  for(var i=0, n=allEvents.length; i < n; ++i) {
+    let anEvent = allEvents[i];
+    // console.log(anEvent);
+    if(nativeEvents.indexOf(anEvent) == -1) {
+      // console.log("Found custom event");
+      const query = await _buildCountQuery(anEvent);
+      const rv = await _nrqlQuery(query, accountId);
+      let count = rv.data.chart[0].data[0].y;
+      data.push(
+        {
+          'eventType' : anEvent,
+          'count' : count
+        } 
+      )
+    }
+  }
   const  _tableData =  [
     {
       metadata: {
-      id: 'series-1',
-      name: 'Serie 1',
-      color: '#008c99',
-      viz: 'main',
-      columns: ['eventType', 'count'],
-    } ,
-    data: data
-  }
-];
-  
+        id: 'series-1',
+        name: 'Serie 1',
+        color: '#008c99',
+        viz: 'main',
+        columns: ['eventType', 'count'],
+      } ,
+      data: data
+    }
+  ];
+  // await console.debug(_tableData);
+  await console.debug(" <<<<<< returning");
   return _tableData;
 }
 
-const _getCustomEventList = async (accountId) => {
-      //  console.debug(accountId);
-      const query = 'show event types';
-      let rv = await _nrqlQuery(query, accountId);
-      const allEvents = rv.data.chart[0].data[0].eventTypes;
-      let customEvents = [];
-      allEvents.forEach(element => {
-            var index = nativeEvents.indexOf(element);
-            if(index == -1 ) {
-                console.log("Custom event found: " + element);
-                customEvents.push(element);
-            }
-      });
-  return customEvents;
-}
-
-async function _buildTableDataBody(counts) {
-  const listOfObjects = [];
-  for (let key of counts.keys()) {
-    console.log(key + " : " + counts.get(key));
-    let singleObject = {};
-    singleObject = { 
-      eventType: key,
-      count: counts.get(key)
-    };
-    listOfObjects.push(singleObject);
-  }
-  return listOfObjects;
-}
-
-
-async function _getCounts(customEvents, accountId) {
-  let customEventMap = new Map();
-  for (let event of customEvents) {
-    const query = await _buildCountQuery(event);
-    let rv = await _nrqlQuery(query, accountId);
-    let count = rv.data.chart[0].data[0].y;
-    customEventMap.set(event, count);
-  }
-  return customEventMap;
-}
-
-const _buildCountQuery = async eventName => {
-  const query = `SELECT COUNT(*) FROM \`${eventName}\` SINCE 5 DAYs AGO`;
+const _buildCountQuery = async anEvent => {
+  const query = `SELECT COUNT(*) FROM \`${anEvent}\` SINCE 5 DAYs AGO`;
   return query;
 };
 
@@ -178,16 +157,5 @@ const _nrqlQuery = async(query, accountId) => {
   return await NrqlQuery.query({query:query, accountId: accountId});
 }
 
-export const tableMetaData = [
-  {
-    metadata: {
-      id: 'series-1',
-      name: 'Serie 1',
-      color: '#008c99',
-      viz: 'main',
-      columns: ['eventType', 'count'],
-    },
-  }
-];
   
 
