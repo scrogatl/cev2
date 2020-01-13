@@ -53,7 +53,7 @@ export const getInstanceData = (accountId) => {
   }`
 }
 
-// don't use - here for example to me - Scott R
+// don't use - here for example to me - Scott R - the following is a comment from creator (not me)
 // Taken from Lew's nr1-container-explorer https://github.com/newrelic/nr1-container-explorer/
 export const accountsWithData = async (eventType) => {
   const gql = `{actor {accounts {name id reportingEventTypes(filter:["${eventType}"])}}}`
@@ -75,6 +75,7 @@ export const nativeEvents = [
   "InfrastructureEvent",
   "IntegrationError",
   "IntegrationProviderReport",
+  "JavaScriptError",
   "Log",
   "Metric",
   "NetworkSample",
@@ -82,6 +83,7 @@ export const nativeEvents = [
   "NrAuditEvent",
   "NRUsageEvent",
   "NrDailyUsage",
+  "NrIntegrationError",
   "NrUsage",
   "PageAction",
   "PageView",
@@ -109,7 +111,61 @@ export const nativeEvents = [
   "TransactionTrace",
 ];
 
+export async function getnTableDataV2(accountId) {
+  await console.debug("-------- genTableDataV2 fired----------");
+  await console.debug(accountId);
+  let nrqlQueries = '';
+  const rv = await _nrqlQuery('show event types', accountId);
+  const allEvents = rv.data.chart[0].data[0].eventTypes;
+  for(var i=0, n=allEvents.length; i < n; ++i) {
+    let anEvent = allEvents[i];
+    if(nativeEvents.indexOf(anEvent) == -1) {
+      const query = await _buildCountQuery(anEvent);
+      const nrqlClause = await _buildGraphClause(anEvent, query);
+      nrqlQueries = nrqlQueries.concat(nrqlClause);
+    }
+  }
+  const data = [];
+  await console.debug("=========== here ============");
+  let rv2 = await _buildGraphQuery(accountId, nrqlQueries);
+  // await console.debug(nrqlQueries);
+  // await console.debug(nrqlQueries.length);
+  // await console.debug(rv2);
+  if(nrqlQueries.length > 0 ) {
+    let result = await NerdGraphQuery.query( {query:rv2} );
+    await console.debug(JSON.stringify(result));
+    await console.debug(JSON.stringify(result.data.actor.account));
+    // await console.debug(JSON.stringify(result.data.actor.account));
+    for (const property in result.data.actor.account) {
+      if(property != '__typename') {
+        console.debug(`${property}:  ${JSON.stringify(result.data.actor.account[property].results[0].count)}`);
+        data.push(
+          {
+            'eventType' : property,
+            'count' : result.data.actor.account[property].results[0].count
+          } 
+        );
+      }
+    }
+    console.debug(JSON.stringify(data));
+  } 
+  const  _tableData =  [
+    {
+      metadata: {
+        id: 'series-1',
+        name: 'Serie 1',
+        color: '#008c99',
+        viz: 'main',
+        columns: ['eventType', 'count'],
+      } ,
+      data: data
+    }
+  ];
+  return _tableData;
+}
+
 export async function genTableData(accountId) {
+  return await getnTableDataV2(accountId);
   const data = [];
   const rv = await _nrqlQuery('show event types', accountId);
   const allEvents = rv.data.chart[0].data[0].eventTypes;
@@ -149,7 +205,15 @@ export async function genTableData(accountId) {
 }
 
 const _buildCountQuery = async anEvent => {
-  const query = `SELECT COUNT(*) FROM \`${anEvent}\` SINCE 5 DAYs AGO`;
+  const query = `SELECT COUNT(*) FROM \`${anEvent}\` `;
+  return query;
+};
+
+const _buildGraphClause = async (theEvent, theQuery) => {
+  const query = `${theEvent}: nrql(query: "${theQuery}") { 
+    results 
+  }
+  `;
   return query;
 };
 
@@ -157,5 +221,16 @@ const _nrqlQuery = async(query, accountId) => {
   return await NrqlQuery.query({query:query, accountId: accountId});
 }
 
+const _buildGraphQuery = async (accountId, queries) => {
+  const rv = `{
+      actor {
+        account(id: ${accountId}) {
+          ${queries}
+        }
+      }
+    }
+  `
+  return rv;
+}
   
 

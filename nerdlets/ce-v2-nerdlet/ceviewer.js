@@ -1,5 +1,5 @@
 import React from 'react';
-import { Spinner, TableChart, BlockText, AccountsQuery, NerdGraphQuery, Dropdown, DropdownItem, Grid, GridItem } from 'nr1';
+import { BarChart, Spinner, TableChart, BlockText, AccountsQuery, NerdGraphQuery, Dropdown, DropdownItem, Grid, GridItem } from 'nr1';
 import { fakeTabledata } from './fake'
 import AccountPicker  from './account-picker'
 import { genTableData } from './utils';
@@ -40,7 +40,7 @@ export default class CeViewer extends React.Component {
     {
     // console.debug(this.state.tableData[0].data.length);
     let chartData = this.state.tableData;
-    if(this.state.tableData[0].data.length == 0) chartData = [];
+    // if(this.state.tableData[0].data.length == 0) chartData = [];
     return (
         <>
           <Grid spacingType={[Grid.SPACING_TYPE.NONE, Grid.SPACING_TYPE.NONE]} >
