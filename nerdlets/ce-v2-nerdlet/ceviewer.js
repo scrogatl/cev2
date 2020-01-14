@@ -1,6 +1,5 @@
 import React from 'react';
-import { BarChart, Spinner, TableChart, BlockText, AccountsQuery, NerdGraphQuery, Dropdown, DropdownItem, Grid, GridItem } from 'nr1';
-import { fakeTabledata } from './fake'
+import { Spinner, TableChart, Grid, GridItem } from 'nr1';
 import AccountPicker  from './account-picker'
 import { genTableDataV2 } from './utils';
 
