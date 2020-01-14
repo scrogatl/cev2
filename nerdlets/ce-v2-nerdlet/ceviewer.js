@@ -2,7 +2,7 @@ import React from 'react';
 import { BarChart, Spinner, TableChart, BlockText, AccountsQuery, NerdGraphQuery, Dropdown, DropdownItem, Grid, GridItem } from 'nr1';
 import { fakeTabledata } from './fake'
 import AccountPicker  from './account-picker'
-import { genTableData } from './utils';
+import { genTableDataV2 } from './utils';
 
 // https://docs.newrelic.com/docs/new-relic-programmable-platform-introduction
 
@@ -23,24 +23,22 @@ export default class CeViewer extends React.Component {
   }
   
   async onAccountSelected(accountId) {
-    await console.debug(">>>>>>>>>>>> onAccountSelected fired <<<<<<<<<<<<<<<");
+    // await console.debug(">>>>>>>>>>>> onAccountSelected fired <<<<<<<<<<<<<<<");
     await console.debug("accountId: "+ accountId);
     this.setState({selectedAccountId: accountId});
     this.setState({isLoading: true});
-    const tableData = await genTableData(this.state.selectedAccountId);
+    const tableData = await genTableDataV2(this.state.selectedAccountId);
     this.setState({tableData, 
                   isLoading: false});
-    // this.setState({isLoading: false});
   }
   
   render() {
-    console.debug("++++++++++ render fired ----------- ");
+    // console.debug("++++++++++ render fired ----------- ");
     // console.debug(JSON.stringify(this.state.tableData));
     if(!this.state.isLoading)
     {
     // console.debug(this.state.tableData[0].data.length);
     let chartData = this.state.tableData;
-    // if(this.state.tableData[0].data.length == 0) chartData = [];
     return (
         <>
           <Grid spacingType={[Grid.SPACING_TYPE.NONE, Grid.SPACING_TYPE.NONE]} >
