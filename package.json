@@ -7,7 +7,7 @@
     "test": "exit 0"
   },
   "nr1": {
-    "uuid": "00dc2a42-4b78-4b0d-abfa-a351be77cfb6"
+    "uuid": "e606ff93-8de0-4baa-89de-98379065461b"
   },
   "dependencies": {
     "prop-types": "^15.6.2",
