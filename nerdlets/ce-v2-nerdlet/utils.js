@@ -1,9 +1,5 @@
-// This file copied from cloud-optimize
-
 import { NrqlQuery, NerdGraphQuery } from 'nr1';
 
-// ===============================
-// my content below 
 export const nativeEvents = [
   "AjaxRequest",
   "BrowserInteraction",
