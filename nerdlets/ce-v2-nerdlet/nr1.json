@@ -1,6 +1,6 @@
 {
     "schemaType": "NERDLET",
     "id": "ce-v2-nerdlet",
-    "displayName": "CECounter",
+    "displayName": "Custom Event Counter",
     "description": "Count custom events"
 }

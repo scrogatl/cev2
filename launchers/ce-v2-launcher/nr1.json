@@ -1,7 +1,7 @@
 {
     "schemaType": "LAUNCHER",
     "id": "ce-v2-launcher",
-    "description": "Describe me",
-    "displayName": "CeV2Launcher",
+    "description": "Custom Event Counter",
+    "displayName": "Count Custom Insights Events",
     "rootNerdletId": "ce-v2-nerdlet"
 }
