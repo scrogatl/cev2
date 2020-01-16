@@ -93,7 +93,7 @@ export async function genTableDataV2(accountId) {
 }
 
 const _buildCountQuery = async anEvent => {
-  const query = `SELECT COUNT(*) FROM \`${anEvent}\` `;
+  const query = `SELECT COUNT(*) FROM \`${anEvent}\` since 1 day ago`;
   return query;
 };
 
