@@ -26,7 +26,5 @@ export default class DataState extends React.Component {
           await callBack(tableData);
         }
     }
-    return null;
   }
-
 }
