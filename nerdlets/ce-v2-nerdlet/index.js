@@ -1,70 +1,55 @@
 import React from 'react';
 import { Spinner, TableChart, Grid, GridItem, PlatformStateContext } from 'nr1';
 import AccountPicker from './account-picker'
-import { genTableDataV2 } from './utils';
+import DataState from './dataState';
 
-export default class CeViewer extends React.Component {
+export default class Wrapper extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
       selectedAccountId: null,
+      timeRange: null,
       tableData: [],
-      isLoading: true
+      isLoading: true,
+      dataState: new DataState()
     };
     this.onAccountSelected = this.onAccountSelected.bind(this);
+    this.onDataReady = this.onDataReady.bind(this);
   }
 
-  async componentDidUpdate() {
-    // account-picker callback seems a better choice
+  async onDataReady(tableData) {
+    console.debug("Data is ready!");
+    this.setState({ tableData, isLoading: false })
   }
-
   async onAccountSelected(accountId) {
-    // await console.debug(">>>>>>>>>>>> onAccountSelected fired <<<<<<<<<<<<<<<");
     await console.debug("accountId: " + accountId);
     this.setState({ selectedAccountId: accountId });
-    this.setState({ isLoading: true });
-    // const { timeRange }  = this.props.launcherUrlState;
-    const tableData = await genTableDataV2(this.state.selectedAccountId);
-    this.setState({ tableData, isLoading: false });
   }
 
   render() {
-    console.debug("++++++++++ render fired ++++++++++++ ");
-    // console.debug(JSON.stringify(this.state.tableData));
-    if (!this.state.isLoading) {
-      // console.debug(this.state.tableData[0].data.length);
-      let chartData = this.state.tableData;
-      return (
-        <>
-          <Grid spacingType={[Grid.SPACING_TYPE.NONE, Grid.SPACING_TYPE.NONE]} >
-            <GridItem>
-              <AccountPicker accountChangedCallback={this.onAccountSelected} />
-            </GridItem>
-          </Grid>
-          <PlatformStateContext.Consumer>
-            {(platformState) => {
-              return(
-                console.debug("hello"),
-                <TableChart data={chartData} fullWidth fullHeight className="" /> 
-              );
-            }}
-            
-          </PlatformStateContext.Consumer>
-        </>
-      );
-    } else {
-      return (
-        <>
-          <Grid spacingType={[Grid.SPACING_TYPE.NONE, Grid.SPACING_TYPE.NONE]} >
-            <GridItem>
-              <AccountPicker accountChangedCallback={this.onAccountSelected} />
-            </GridItem>
-          </Grid>
-          <Spinner />
-        </>
-      );
-    }
+    return (
+      <>
+        <Grid spacingType={[Grid.SPACING_TYPE.NONE, Grid.SPACING_TYPE.NONE]} >
+          <GridItem>
+            <AccountPicker accountChangedCallback={this.onAccountSelected} />
+          </GridItem>
+        </Grid>
+        <PlatformStateContext.Consumer>
+          {(platformState) => {
+            const { timeRange } = platformState;
+            this.state.dataState.getSomeData(timeRange, this.state.selectedAccountId, this.onDataReady);
+            if(!this.state.isLoading) {
+            return (
+              <TableChart data={this.state.tableData} fullWidth fullHeight className="" />
+            );
+            } else {
+              <Spinner />
+            }
+          }}
+        </PlatformStateContext.Consumer>
+      </>
+    );
   }
 }
 

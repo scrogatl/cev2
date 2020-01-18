@@ -53,7 +53,6 @@ export async function genTableDataV2(accountId, timeRange) {
     let anEvent = allEvents[i];
     if(nativeEvents.indexOf(anEvent) == -1) {
       const query = await _buildCountQuery(anEvent) + timeRangeToNrql(timeRange);
-      console.debug(query);
       const nrqlClause = await _buildGraphClause(anEvent, query);
       nrqlQueries = nrqlQueries.concat(nrqlClause);
     }
