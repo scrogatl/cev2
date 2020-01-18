@@ -43,7 +43,7 @@ export const nativeEvents = [
   "TransactionTrace",
 ];
 
-export async function genTableDataV2(accountId) {
+export async function genTableDataV2(accountId, timeRange) {
   // console.debug("-------- genTableDataV2 fired----------");
   // console.debug(accountId);
   let nrqlQueries = '';
@@ -52,7 +52,8 @@ export async function genTableDataV2(accountId) {
   for(var i=0, n=allEvents.length; i < n; ++i) {
     let anEvent = allEvents[i];
     if(nativeEvents.indexOf(anEvent) == -1) {
-      const query = await _buildCountQuery(anEvent);
+      const query = await _buildCountQuery(anEvent) + timeRangeToNrql(timeRange);
+      console.debug(query);
       const nrqlClause = await _buildGraphClause(anEvent, query);
       nrqlQueries = nrqlQueries.concat(nrqlClause);
     }
@@ -93,7 +94,7 @@ export async function genTableDataV2(accountId) {
 }
 
 const _buildCountQuery = async anEvent => {
-  const query = `SELECT COUNT(*) FROM \`${anEvent}\` since 1 day ago`;
+  const query = `SELECT COUNT(*) FROM \`${anEvent}\` `;
   return query;
 };
 
@@ -121,4 +122,19 @@ const _buildGraphQuery = async (accountId, queries) => {
   return rv;
 }
   
+/*
+ * Helper function to turn timeRange into NRQL Since
+ */
+export const timeRangeToNrql = timeRange => {
+  if (!timeRange) {
+    return "";
+  } else if (timeRange.begin_time && timeRange.end_time) {
+    return ` SINCE ${timeRange.begin_time} UNTIL ${timeRange.end_time}`;
+  } else if (timeRange.duration) {
+    return ` SINCE ${timeRange.duration / 1000} SECONDS AGO`;
+  }
+
+  return "";
+};
+
 
