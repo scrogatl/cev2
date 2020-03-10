@@ -21,9 +21,9 @@ export default class DataState extends React.Component {
     }
     if(this.state.selectedAccountId && this.state.timeRange && this.state.shouldUpdate ) {
       this.state.shouldUpdate = false;
-      const tableData = await genTableDataV2(this.state.selectedAccountId,this.state.timeRange);
+      const {td, tc} = await genTableDataV2(this.state.selectedAccountId,this.state.timeRange);
       if(callBack) {
-          await callBack(tableData);
+          await callBack(td, tc  );
         }
     }
   }

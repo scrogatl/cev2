@@ -2,51 +2,67 @@ import { NrqlQuery, NerdGraphQuery } from 'nr1';
 
 export const nativeEvents = [
   "AjaxRequest",
-  "BrowserInteraction",
-  "ErrorTrace",
-  "InfrastructureEvent",
-  "IntegrationError",
-  "IntegrationProviderReport",
-  "JavaScriptError",
-  "Log",
-  "Metric",
-  "NetworkSample",
-  "NginxSample",
-  "NrAuditEvent",
-  "NRUsageEvent",
-  "NrDailyUsage",
-  "NrIntegrationError",
-  "NrUsage",
-  "PageAction",
-  "PageView",
-  "PageView",
-  "PageViewTiming",
-  "PageViewTiming",
-  "ProcessSample",
-  "RedisKeyspaceSample",
-  "RedisSample",
-  "Relationship",
-  "SampledTransaction",
-  "SampledTransactionError",
-  "Span",
-  "Span",
-  "StatsDApplicationEvent",
-  "StorageSample",
-  "SyntheticCheck",
-  "SyntheticCheck",
-  "SyntheticRequest",
-  "SyntheticsPrivateLocationStatus",
-  "SyntheticsPrivateMinion",
-  "SystemSample",
-  "Transaction",
-  "TransactionError",
-  "TransactionTrace",
+"AutoScalingGroupSample",
+"AutoScalingInstanceSample",
+"AutoScalingLaunchConfigurationSample",
+"AutoScalingPolicySample",
+"AutoScalingRegionLimitSample",
+"AwsWafWebACLSample",
+"BrowserInteraction",
+"ComputeSample",
+"DatastoreSample",
+"DistributedTraceIndex",
+"ErrorTrace",
+"FinanceSample",
+"InfrastructureEvent",
+"IntegrationDataFreshnessReport",
+"IntegrationError",
+"IntegrationProviderReport",
+"JavaScriptError",
+"LoadBalancerSample",
+"Log",
+"Metric",
+"NRUsageEvent",
+"NetworkSample",
+"NginxSample",
+"NrAuditEvent",
+"NrDailyUsage",
+"NrIntegrationError",
+"NrUsage",
+"PageAction",
+"PageView",
+"PageView",
+"PageViewTiming",
+"PageViewTiming",
+"Plugins_Heartbeat",
+"PrivateNetworkSample",
+"ProcessSample",
+"RedisKeyspaceSample",
+"RedisSample",
+"Relationship",
+"SampledTransaction",
+"SampledTransactionError",
+"Span",
+"Span",
+"SqlTrace",
+"StatsDApplicationEvent",
+"StorageSample",
+"SyntheticCheck",
+"SyntheticCheck",
+"SyntheticRequest",
+"SyntheticsPrivateLocationStatus",
+"SyntheticsPrivateMinion",
+"SystemSample",
+"Transaction",
+"TransactionError",
+"TransactionTrace"
 ];
 
 export async function genTableDataV2(accountId, timeRange) {
   // console.debug("-------- genTableDataV2 fired----------");
   // console.debug(accountId);
   let nrqlQueries = '';
+  let _totalCount = null; 
   const rv = await _nrqlQuery('show event types', accountId);
   const allEvents = rv.data.chart[0].data[0].eventTypes;
   for(var i=0, n=allEvents.length; i < n; ++i) {
@@ -69,6 +85,7 @@ export async function genTableDataV2(accountId, timeRange) {
             'count' : result.data.actor.account[property].results[0].count
           } 
         );
+        _totalCount = _totalCount + result.data.actor.account[property].results[0].count; 
       }
     }
   } 
@@ -85,9 +102,16 @@ export async function genTableDataV2(accountId, timeRange) {
     }
   ];
   if(data.length > 0) {
-    return _tableData;
+    console.debug(">>>>> _totalCount: " + _totalCount);
+    return {
+     td:  _tableData,
+     tc:  _totalCount
+    }
   } else {
-    return [];
+    return {
+      td: [],
+      tc: 0,
+    }
   }
 
 }
