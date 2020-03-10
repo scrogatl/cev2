@@ -21,8 +21,6 @@ export default class Wrapper extends React.Component {
 
   async onDataReady(tableData, totalCount) {
     console.debug("Data is ready!");
-    console.debug("tableData: " + tableData);
-    console.debug("totalCount: " + totalCount);
     this.setState({ tableData, isLoading: false, totalCount })
   }
   async onAccountSelected(accountId) {

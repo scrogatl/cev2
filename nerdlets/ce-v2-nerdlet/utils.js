@@ -102,7 +102,6 @@ export async function genTableDataV2(accountId, timeRange) {
     }
   ];
   if(data.length > 0) {
-    console.debug(">>>>> _totalCount: " + _totalCount);
     return {
      td:  _tableData,
      tc:  _totalCount
