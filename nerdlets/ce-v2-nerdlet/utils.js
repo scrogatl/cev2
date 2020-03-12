@@ -1,16 +1,19 @@
 import { NrqlQuery, NerdGraphQuery } from 'nr1';
 
 export const nativeEvents = [
-  "AjaxRequest",
+"AjaxRequest",
+"ApiGatewaySample",
 "AutoScalingGroupSample",
 "AutoScalingInstanceSample",
 "AutoScalingLaunchConfigurationSample",
 "AutoScalingPolicySample",
 "AutoScalingRegionLimitSample",
 "AwsWafWebACLSample",
+"BlockDeviceSample",
 "BrowserInteraction",
 "ComputeSample",
 "DatastoreSample",
+"DnsSample",
 "DistributedTraceIndex",
 "ErrorTrace",
 "FinanceSample",
@@ -42,6 +45,7 @@ export const nativeEvents = [
 "Relationship",
 "SampledTransaction",
 "SampledTransactionError",
+"ServerlessSample",
 "Span",
 "Span",
 "SqlTrace",
